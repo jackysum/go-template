@@ -11,6 +11,7 @@ type middlewareOpt func(http.Handler) http.Handler
 
 func Setup(opts ...middlewareOpt) http.Handler {
 	mux := http.NewServeMux()
+	routes(mux)
 
 	var h http.Handler = mux
 	for _, opt := range opts {
