@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	zerologadapter "github.com/jackc/pgx-zerolog"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/rs/zerolog"
@@ -47,4 +48,29 @@ func WithLogger(log zerolog.Logger) configOpt {
 			LogLevel: tracelog.LogLevelInfo,
 		}
 	}
+}
+
+type TxnFunc func(ctx context.Context, tx pgx.Tx) error
+
+func (db *Database) WithTxn(ctx context.Context, fn TxnFunc) error {
+	tx, err := db.pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("database#WithTxn - error starting transaction: %w", err)
+	}
+
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil && err != pgx.ErrTxClosed {
+			fmt.Printf("database#WithTxn - error rolling back transaction: %v\n", err)
+		}
+	}()
+
+	if err := fn(ctx, tx); err != nil {
+		return fmt.Errorf("database#WithTxn - error executing transaction function: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("database#WithTxn - error committing transaction: %w", err)
+	}
+
+	return nil
 }
