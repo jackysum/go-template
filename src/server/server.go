@@ -3,21 +3,23 @@ package server
 import (
 	"net/http"
 
+	"github.com/jackysum/go-template/src/server/handler"
 	"github.com/jackysum/go-template/src/server/middleware"
 	"github.com/rs/zerolog"
 )
 
 type middlewareOpt func(http.Handler) http.Handler
 
-func Setup(opts ...middlewareOpt) http.Handler {
+func Setup(h *handler.Handler, opts ...middlewareOpt) http.Handler {
 	mux := http.NewServeMux()
+	routes(mux, h)
 
-	var h http.Handler = mux
+	var s http.Handler = mux
 	for _, opt := range opts {
-		h = opt(h)
+		s = opt(s)
 	}
 
-	return h
+	return s
 }
 
 func WithLogger(log zerolog.Logger) middlewareOpt {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/jackysum/go-template/cmd/server/config"
 	"github.com/jackysum/go-template/src/server"
+	"github.com/jackysum/go-template/src/server/handler"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 )
@@ -19,6 +20,7 @@ func main() {
 	cfg := config.New(log)
 
 	s := server.Setup(
+		handler.New(),
 		server.WithLogger(log),
 	)
 
