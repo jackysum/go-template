@@ -50,6 +50,18 @@ func WithLogger(log zerolog.Logger) configOpt {
 	}
 }
 
+func (db *Database) Begin(ctx context.Context) (pgx.Tx, error) {
+	tx, err := db.pool.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("database#Begin - error starting transaction: %w", err)
+	}
+	return tx, nil
+}
+
+func (db *Database) Close() {
+	db.pool.Close()
+}
+
 type TxnFunc func(ctx context.Context, tx pgx.Tx) error
 
 func (db *Database) WithTxn(ctx context.Context, fn TxnFunc) error {

@@ -44,6 +44,43 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestDatabase_Begin(t *testing.T) {
+	ctx := t.Context()
+	cfg := testhelper.Config(t)
+	db, err := database.New(ctx, cfg.DatabaseConnString, database.WithLogger(zerolog.New(nil)))
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		ctx     context.Context
+		wantErr bool
+	}{
+		"success": {
+			ctx:     ctx,
+			wantErr: false,
+		},
+		"error starting transaction": {
+			ctx:     testhelper.CancelledContext(t),
+			wantErr: true,
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			tx, gotErr := db.Begin(tc.ctx)
+
+			if tc.wantErr {
+				require.Error(t, gotErr)
+				return
+			}
+
+			require.NoError(t, gotErr)
+			require.NotNil(t, tx)
+
+			tx.Rollback(context.Background())
+		})
+	}
+}
+
 func TestDatabase_WithTxn(t *testing.T) {
 	ctx := t.Context()
 	cfg := testhelper.Config(t)
