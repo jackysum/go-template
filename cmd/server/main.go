@@ -1,15 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
+	"github.com/jackysum/go-template/cmd/server/config"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 )
 
 func main() {
-	getLogger()
+	log := getLogger()
+	cfg := config.New(log)
+
+	fmt.Println(cfg.Port)
 }
 
 func getLogger() zerolog.Logger {
