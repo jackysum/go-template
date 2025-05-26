@@ -5,9 +5,9 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main ./cmd/server/main.go"
+  cmd = "npx @tailwindcss/cli -i ./web/static/css/input.css -o ./web/static/css/main.css && go build -o ./tmp/main ./cmd/server/main.go"
   delay = 1000
-  exclude_dir = ["test", "tmp"]
+  exclude_dir = ["node_modules", "test", "tmp"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
