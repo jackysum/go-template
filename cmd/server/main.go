@@ -18,7 +18,9 @@ func main() {
 	log := getLogger()
 	cfg := config.New(log)
 
-	s := server.Setup()
+	s := server.Setup(
+		server.WithLogger(log),
+	)
 
 	svr := &http.Server{
 		Addr:    ":" + cfg.Port,
@@ -56,5 +58,9 @@ func getLogger() zerolog.Logger {
 		TimeFormat: time.RFC3339,
 	}
 
-	return zerolog.New(out).Level(zerolog.InfoLevel).With().Timestamp().Logger()
+	return zerolog.New(out).
+		Level(zerolog.InfoLevel).
+		With().
+		Timestamp().
+		Logger()
 }
